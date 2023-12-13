@@ -1,6 +1,6 @@
 from database_connect import Neo4jConnection
 from produto import criar_produto, listar_produtos
-from usuario import adicionar_compra, criar_usuario, listar_usuarios
+from usuario import adicionar_compra, criar_usuario, listar_compras, listar_usuarios
 from vendedor import adicionar_produto, criar_vendedor, listar_vendedores
 
 neo4j_uri = "neo4j+s://8e60f93c.databases.neo4j.io"
@@ -50,7 +50,7 @@ while (key != 'S' and key != 's'):
 
         elif (sub == '4'):
             print("|--------------------------------------------------------------|")
-#            listar_compras_usuario(neo4j_connection)
+            listar_compras(neo4j_connection)
             print ("")
         
             

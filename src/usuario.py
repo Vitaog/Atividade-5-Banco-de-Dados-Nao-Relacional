@@ -153,3 +153,49 @@ def adicionar_compra(connection):
     finally:
         connection.close()
 
+def listar_compras(connection):
+    try:
+        connection.connect()
+
+        query_listar_usuarios = (
+            "MATCH (u:Usuario) RETURN u.id AS id, u.nome_usuario AS nome, u.cpf AS cpf, "
+            "u.rua AS rua, u.num AS num, u.bairro AS bairro, u.cidade AS cidade, u.estado AS estado, u.cep AS cep"
+        )
+
+        usuarios = connection.query(query_listar_usuarios)
+
+        print("Lista de Usuários:")
+        for i, usuario in enumerate(usuarios, start=1):
+            print(f"{i}. Nome: {usuario['nome']}")
+
+        try:
+            index_usuario = int(input("Digite o número do usuário desejado (0 para sair): "))
+            if index_usuario == 0:
+                return
+            usuario_selecionado = usuarios[index_usuario - 1]
+
+            # Exibir detalhes do Usuário
+            print("\nDetalhes do Usuário:")
+            print(f"ID: {usuario_selecionado['id']}")
+            print(f"Nome: {usuario_selecionado['nome']}")
+            print(f"CPF: {usuario_selecionado['cpf']}")
+
+            # Listar Compras do Usuário
+            query_compras_usuario = (
+                f"MATCH (u:Usuario)-[:REALIZOU]->(c:Compra) "
+                f"WHERE u.id = '{usuario_selecionado['id']}' "
+                "RETURN c.data_compra AS data_compra, c.valor_total AS valor_total, c.preco_produto AS preco_produto, c.nome_produto AS nome_produto, c.nome_vendedor AS nome_vendedor, c.quantidade AS quantidade"
+            )
+            compras_usuario = connection.query(query_compras_usuario)
+
+            if compras_usuario:
+                print("\nCompras Realizadas:")
+                for i, compra in enumerate(compras_usuario, start=1):
+                    print(f"{i}. Nome do Produto: {compra['nome_produto']} \nValor Total: {compra['valor_total']} \nNome Vendedor: {compra['nome_vendedor']} \nPreço Produto: {compra['preco_produto']} \nQuantidade: {compra['quantidade']}")
+            else:
+                print("\nO usuário ainda não realizou nenhuma compra.")
+
+        except (ValueError, IndexError):
+            print("Seleção inválida.")
+    finally:
+        connection.close()
